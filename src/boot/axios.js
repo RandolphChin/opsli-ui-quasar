@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import { useAuthStore } from 'src/stores/authStore'
 import {useRouter} from "vue-router";
+import { setting } from "src/setting.config";
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -9,12 +10,16 @@ import {useRouter} from "vue-router";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://api.example.com' })
+const api = axios.create({
+  baseURL: process.env.API,
+  timeout: 120000,
+})
 
 api.interceptors.request.use((config) => {
   const authStore = useAuthStore();
-  if (authStore.token) {
-    config.headers.Authorization = `Bearer ${authStore.token}`;
+  if (authStore.accessToken) {
+    let tokenName = setting.tokenName;
+    config.headers[tokenName] = `Bearer ${authStore.accessToken}`;
   }
   return config;
 }, (error) => Promise.reject(error));
@@ -39,7 +44,7 @@ api.interceptors.response.use(
   error => {
     const authStore = useAuthStore();
     const router = useRouter();
-
+      debugger;
     // Check if the error response is 401
     if (error.response && error.response.status === 401) {
       // 处理未授权请求

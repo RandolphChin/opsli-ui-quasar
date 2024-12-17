@@ -17,22 +17,30 @@
           </q-card-section>
           <q-card-section>
             <q-form class="q-gutter-md">
-              <q-input filled v-model="username" label="Username" lazy-rules />
+              <q-input filled v-model="form.principal" label="Username" lazy-rules />
 
               <q-input
                 type="password"
                 filled
-                v-model="password"
+                v-model="form.password"
                 label="Password"
                 lazy-rules
               />
-
+              <q-input filled no-error-icon v-model.trim="form.verificationCode" color="black"
+                       label="请输入验证码" :rules="[(val) => (val && val.length > 0) || '请输入验证码']">
+                <template v-slot:after>
+                  <q-btn padding="none" style="width: 130px; height: 100%" @click="getCaptcha">
+                    <q-img :src="captchaImage" />
+                  </q-btn>
+                </template>
+              </q-input>
               <div>
                 <q-btn
                   label="Login"
                   @click="handleLogin"
                   type="button"
                   color="primary"
+                  :loading="form.loading"
                 />
               </div>
             </q-form>
@@ -44,23 +52,44 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import { useRouter, useRoute  } from "vue-router";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/authStore";
 import { fakeBackend } from "src/fakeBackend";
+import { usePublicKeyStore} from "stores/publicKeyStore";
+import { uuid } from "@/utils/index";
+import { captcha } from "@/api/login/login"
 
-const username = ref("admin");
-const password = ref("password");
+
+const form = ref({
+  principal: 'admin',
+  password: 'Aa123456.',
+  verificationCode: '',
+  loading: false,
+  uuid: uuid(),
+  loginFrom: "0"
+})
+const redirect = ref('/');// 重定向地址
+const captchaImage = ref(null);
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute ();
 const $q = useQuasar();
 
 const handleLogin = async () => {
   try {
+    form.value.loading = true;
+    await authStore.handelLogin(form.value);
+    const routerPath =
+      redirect.value === "/404" || redirect.value === "/401"
+        ? "/"
+        : redirect.value;
+    router.push(routerPath).catch(() => {});
+/*
     const response = await fakeBackend.login({
-      username: username.value,
-      password: password.value,
+      // username: username.value,
+      // password: password.value,
     });
     authStore.setToken(response.token);
     authStore.setUser(response.user);
@@ -71,27 +100,35 @@ const handleLogin = async () => {
     dynamicMenu.forEach((menu) => {
       router.addRoute("Home", menu);
     });
-    router.getRoutes().forEach((w) => {
-      //console.log("router...begin");
-      //console.log(w.path);
-      //console.log("router...end");
-    });
-    router.push("/");
+    */
   } catch (error) {
     console.log(error);
     $q.notify(error);
   }
 };
-/*
 
+const getCaptcha = () => {
+  captchaImage.value = captcha(form.value.uuid);
+}
+
+import { getUserInfo } from "@/api/login/user.js"
+// const publicKeyStore =usePublicKeyStore();
 // 检查是否已登录
-onMounted(() => {
-  if (authStore.token) {
-    // 如果用户已登录，重定向到首页
-    router.push('/');
-  }
+onMounted( () => {
+  console.log('login....onmounted');
+  console.log('login....redirect',redirect.value);
+  getCaptcha();
+  getUserInfo();
 });
-*/
+
+// 监听路由的变化
+watch(
+  () => route.query, // 监听路由的 query 参数
+  (newQuery) => {
+    redirect.value = (newQuery && newQuery.redirect) || '/';
+  },
+  { immediate: true } // 立即执行
+);
 </script>
 <style scoped>
 .bg-image {

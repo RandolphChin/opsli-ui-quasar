@@ -50,7 +50,7 @@ export default route(function (/* { store, ssrContext } */) {
       });
     }
     // 检查是否需要登录
-    if (to.meta.requiresAuth && !authStore.token) {
+    if (to.meta.requiresAuth && !authStore.accessToken) {
       next("/login"); // 未登录时跳转到登录页
     } else {
       if (!authStore.setMenuFlag) {

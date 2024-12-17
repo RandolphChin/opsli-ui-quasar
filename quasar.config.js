@@ -13,7 +13,7 @@ const { configure } = require('quasar/wrappers');
 const path = require('path');
 
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx ) {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -65,6 +65,13 @@ module.exports = configure(function (/* ctx */) {
       // publicPath: '/',
       // analyze: true,
       // env: {},
+      env: {
+        API: ctx.dev
+          // 测试代理地址
+          ? "http://127.0.0.1:7000/opsli-boot/"
+          // 正式代理地址
+          : "http://81.68.159.232:8888/"
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
