@@ -19,7 +19,8 @@ api.interceptors.request.use((config) => {
   const authStore = useAuthStore();
   if (authStore.accessToken) {
     let tokenName = setting.tokenName;
-    config.headers[tokenName] = `Bearer ${authStore.accessToken}`;
+    // config.headers[tokenName] = `Bearer ${authStore.accessToken}`;
+    config.headers[tokenName] = `${authStore.accessToken}`;
   }
   return config;
 }, (error) => Promise.reject(error));

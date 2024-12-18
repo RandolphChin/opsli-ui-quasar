@@ -111,14 +111,10 @@ const getCaptcha = () => {
   captchaImage.value = captcha(form.value.uuid);
 }
 
-import { getUserInfo } from "@/api/login/user.js"
-// const publicKeyStore =usePublicKeyStore();
-// 检查是否已登录
+
 onMounted( () => {
-  console.log('login....onmounted');
   console.log('login....redirect',redirect.value);
   getCaptcha();
-  getUserInfo();
 });
 
 // 监听路由的变化
