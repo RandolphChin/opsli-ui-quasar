@@ -36,7 +36,7 @@
 import {computed, ref, watchEffect} from 'vue';
 import { useHistoryStore } from '../stores/tagViewStore';
 import {useRouter, useRoute} from "vue-router";
-import { mockRoutes } from '../mock'; // 引入 mockRoutes
+import { useAuthStore} from "../stores/authStore";
 
 const router = useRouter();
 const route = useRoute();
@@ -50,13 +50,19 @@ const menuPosition = ref({ x: 0, y: 0 }); // 存储菜单位置
 // 获取历史路由
 const historyRoutes = computed(() => {
   const store = useHistoryStore();
+  const authStore = useAuthStore();
   const filteredRoutes = store.historyStack.filter(route => {
     // 只保留不包含子路由的菜单
-    const mockRoute = mockRoutes.find(mockRoute => mockRoute.name === route.name);
+    console.log(authStore.accessRoutes);
+    debugger;
+    const mockRoute = authStore.accessRoutes.find(rou => rou.name === route.name);
+    console.log(mockRoute);
     return !mockRoute?.children || mockRoute.children.length === 0; // 确保没有子路由
   });
+  debugger;
   // 确保第一个 tab 始终是首页
-  return [{ path: '/', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> '/' != v.path))];
+  // return [{ path: '/', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> '/' != v.path))];
+     return [{ path: '/index', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> (('/index' != v.path) || ('/' != v.path)) ))];
 });
 
 function navTo (path) {

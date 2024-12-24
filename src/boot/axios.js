@@ -1,9 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import { useAuthStore } from 'src/stores/authStore'
-import {useRouter} from "vue-router";
 import { setting } from "src/setting.config";
-
+import { Notify } from 'quasar'
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a
@@ -15,17 +14,53 @@ const api = axios.create({
   timeout: 120000,
 })
 
-api.interceptors.request.use((config) => {
-  const authStore = useAuthStore();
-  if (authStore.accessToken) {
-    let tokenName = setting.tokenName;
-    // config.headers[tokenName] = `Bearer ${authStore.accessToken}`;
-    config.headers[tokenName] = `${authStore.accessToken}`;
-  }
-  return config;
-}, (error) => Promise.reject(error));
+export default boot(({ app, router }) => {
+  api.interceptors.request.use((config) => {
+    const authStore = useAuthStore();
+    if (authStore.accessToken) {
+      let tokenName = setting.tokenName;
+      // config.headers[tokenName] = `Bearer ${authStore.accessToken}`;
+      config.headers[tokenName] = `${authStore.accessToken}`;
+    }
+    return config;
+  }, error => {
+    Notify.create({
+      type: 'negative',
+      message: error,
+    })
+    return Promise.reject(error)
+  })
 
-export default boot(({ app }) => {
+  const authStore = useAuthStore();
+  api.interceptors.response.use(
+    response => {
+      // Return the response as it is if no error
+      const responseData = response.data
+      const { code } = responseData
+      if (code === 0) {
+        return response
+      } else {
+        authStore.logout();
+        router.push('/login');
+      }
+      return response;
+    },
+    error => {
+      // Check if the error response is 401
+      if (error.response && error.response.status === 401) {
+        // 处理未授权请求
+        authStore.logout(); // 清除 token 和用户信息
+        router.push('/login'); // 导航到登录页
+      }else {
+        Notify.create({
+          type: 'negative',
+          message: error.message
+        })
+      }
+
+      return Promise.reject(error);
+    }
+  );
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$axios = axios
@@ -37,23 +72,5 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
 })
 
-api.interceptors.response.use(
-  response => {
-    // Return the response as it is if no error
-    return response;
-  },
-  error => {
-    const authStore = useAuthStore();
-    const router = useRouter();
-      debugger;
-    // Check if the error response is 401
-    if (error.response && error.response.status === 401) {
-      // 处理未授权请求
-      authStore.logout(); // 清除 token 和用户信息
-      router.push('/login'); // 导航到登录页
-    }
 
-    return Promise.reject(error);
-  }
-);
 export { api }

@@ -5,7 +5,7 @@ export const useHistoryStore = defineStore('useHistoryStore', {
     historyStack: [], // 存储历史记录的数组
   }),
   actions: {
-    addRoute(route) {
+    addHistory(route) {
       // 确保不重复添加相同的路由
       if (!this.historyStack.find(r => r.name == route.name)) {
         this.historyStack.push(route);

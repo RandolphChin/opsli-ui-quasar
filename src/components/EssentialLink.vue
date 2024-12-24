@@ -10,7 +10,7 @@
   </q-item-section>
 
   <q-item-section>
-    <q-item-label>{{ props.title }}</q-item-label>
+    <q-item-label>{{ props.name }}</q-item-label>
     <q-item-label caption>{{ props.caption }}</q-item-label>
   </q-item-section>
     <!-- 如果有子菜单, 显示箭头图标 -->
@@ -23,7 +23,7 @@
     <EssentialLink
       v-for="child in children"
       :key="child.name"
-      :title="child.meta.title"
+      :name="child.name"
       :icon="child.icon"
       :meta="child.meta"
       :path="`${path}/${child.path}`"
@@ -42,11 +42,6 @@ defineOptions({
 })
 
 const props = defineProps({
-  title: {
-    type: String,
-    required: true
-  },
-
   path: {
     type: String,
     default: '#'

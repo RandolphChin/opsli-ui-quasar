@@ -68,7 +68,7 @@
         </q-item-label>
         <EssentialLink
           v-for="link in linksList"
-          :key="link.title"
+          :key="link.name"
           v-bind="link"
           :children="link.children"
         />
@@ -84,7 +84,6 @@
 <script setup>
 import { ref, watch } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
-import { mockRoutes } from '../mock'; // 引入 mockRoutes
 import { useRouter } from 'vue-router';
 import BreadCrumbs from 'components/BreadCrumbs.vue';
 import TagHistory from "components/History.vue";
@@ -100,7 +99,7 @@ const $q = useQuasar();
 const router = useRouter();
 const authStore = useAuthStore();
 // 生成动态菜单项
-const linksList = mockRoutes;
+const linksList = authStore.accessRoutes; //mockRoutes;
 const leftDrawerOpen = ref(false)
 // 切换左侧抽屉
 function toggleLeftDrawer() {
@@ -141,11 +140,11 @@ watch(
   (to) => {
     // 确保在点击没有子路由的菜单时才添加历史记录
     const historyStore = useHistoryStore();
-    const route = mockRoutes.find(route => route.name === to.name);
-
+    const route = authStore.accessRoutes.find(route => route.name === to.name);
+    debugger;
     // 如果路由存在，并且没有 children，则添加到 history
     if (route && (!route.children || route.children.length === 0)) {
-      historyStore.addRoute({ name: route.name, meta: route.meta, path: to.path });
+      historyStore.addHistory({ name: route.name, meta: route.meta, path: to.path });
     }
   }
 );

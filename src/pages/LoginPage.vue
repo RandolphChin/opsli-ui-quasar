@@ -83,24 +83,12 @@ const handleLogin = async () => {
     await authStore.handelLogin(form.value);
     const routerPath =
       redirect.value === "/404" || redirect.value === "/401"
-        ? "/"
+        ? "/index"
         : redirect.value;
+
+    // await useRouterStore.setAllRoutes();
     router.push(routerPath).catch(() => {});
-/*
-    const response = await fakeBackend.login({
-      // username: username.value,
-      // password: password.value,
-    });
-    authStore.setToken(response.token);
-    authStore.setUser(response.user);
-    // 获取动态菜单
-    const dynamicMenu = await fakeBackend.getDynamicMenu();
-    authStore.setMenu(true);
-    // 动态添加路由
-    dynamicMenu.forEach((menu) => {
-      router.addRoute("Home", menu);
-    });
-    */
+
   } catch (error) {
     console.log(error);
     $q.notify(error);

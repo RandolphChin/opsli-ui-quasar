@@ -5,10 +5,13 @@ import {
   createWebHistory,
   createWebHashHistory,
 } from "vue-router";
-import routes from "./routes";
+import { constantRoutes } from "./routes";
 import { useHistoryStore } from "src/stores/tagViewStore";
 import { useAuthStore } from "src/stores/authStore";
-import { fakeBackend } from "src/fakeBackend";
+//import { fakeBackend } from "src/fakeBackend";
+//import {getMenuList} from "src/api/login/menus";
+//import {devRoutes} from "src/router/devRouter";
+//import {filterAllRoutes} from "src/utils/handleRoutes";
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -27,7 +30,7 @@ export default route(function (/* { store, ssrContext } */) {
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
-    routes,
+    routes: constantRoutes,
 
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
@@ -36,30 +39,35 @@ export default route(function (/* { store, ssrContext } */) {
   });
   // 在导航守卫中更新历史记录
   Router.beforeEach(async (to, from, next) => {
-    // 获取 Pinia store 实例
-    const historyStore = useHistoryStore();
-    if (to.path != "/login") {
-      historyStore.addRoute(to); // 调用 store 中的添加方法
-    }
     const authStore = useAuthStore();
     console.log("setMenuFlag ", authStore.setMenuFlag);
-    const menus = await fakeBackend.getDynamicMenu();
-    if (!authStore.setMenuFlag && menus) {
-      menus.forEach((menu) => {
-        Router.addRoute("Home", menu);
-      });
+    // 如果是登录页面，直接放行
+    if (to.path == "/login") {
+      return next(); // 已经在登录页，直接放行
     }
-    // 检查是否需要登录
-    if (to.meta.requiresAuth && !authStore.accessToken) {
-      next("/login"); // 未登录时跳转到登录页
-    } else {
-      if (!authStore.setMenuFlag) {
-        authStore.setMenu(true);
-        next({ ...to, replace: true });
-      } else {
-        next(); // 已登录则继续导航
+    const historyStore = useHistoryStore();
+    if (to.path != "/login") {
+      historyStore.addHistory(to); // 调用 store 中的添加方法
+    }
+
+    const accessToken = authStore.accessToken;
+    if(!accessToken){
+      next("/login");
+    }else {
+      if(authStore.roles.length == 0){
+          await authStore.handelUserInfo();
+          await authStore.handelUserMenu();
+        authStore.accessRoutes.forEach(v=>{
+          // Router.addRoute("Home", v);
+          Router.addRoute(v);
+        })
+          authStore.setMenu(true);
+          next({ ...to, replace: true })
+      }else {
+        next();
       }
     }
+
   });
 
   return Router; // 修改此处以返回包含 historyStack 的对象
