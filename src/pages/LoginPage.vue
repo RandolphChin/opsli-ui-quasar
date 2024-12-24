@@ -56,8 +56,6 @@ import {onMounted, ref, watch} from "vue";
 import { useRouter, useRoute  } from "vue-router";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/authStore";
-import { fakeBackend } from "src/fakeBackend";
-import { usePublicKeyStore} from "stores/publicKeyStore";
 import { uuid } from "@/utils/index";
 import { captcha } from "@/api/login/login"
 
@@ -86,7 +84,6 @@ const handleLogin = async () => {
         ? "/index"
         : redirect.value;
 
-    // await useRouterStore.setAllRoutes();
     router.push(routerPath).catch(() => {});
 
   } catch (error) {

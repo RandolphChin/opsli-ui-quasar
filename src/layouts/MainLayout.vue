@@ -82,14 +82,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch} from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
 import { useRouter } from 'vue-router';
 import BreadCrumbs from 'components/BreadCrumbs.vue';
 import TagHistory from "components/History.vue";
 import { useHistoryStore } from '../stores/tagViewStore';
 import { useQuasar } from "quasar";
-import { fakeBackend } from "src/fakeBackend";
 import { useAuthStore } from "src/stores/authStore";
 
 defineOptions({
@@ -99,7 +98,11 @@ const $q = useQuasar();
 const router = useRouter();
 const authStore = useAuthStore();
 // 生成动态菜单项
-const linksList = authStore.accessRoutes; //mockRoutes;
+// const linksList = authStore.accessRoutes;
+const homeRoute = authStore.accessRoutes.find(route => route.path === '/');
+homeRoute.children = [];
+const linksList = authStore.accessRoutes;
+
 const leftDrawerOpen = ref(false)
 // 切换左侧抽屉
 function toggleLeftDrawer() {
@@ -122,11 +125,9 @@ const logout = () => {
     persistent: true
   }).onOk( () => {
     console.log('>>>> OK')
-    const dynamicMenu = fakeBackend.loginOff();
-    if (dynamicMenu) { // 登出成功
-      authStore.logout();
-      router.push('/login');
-    }
+  // 登出成功
+   authStore.logout();
+   router.push('/login');
   }).onOk(() => {
     console.log('>>>> second OK catcher')
   }).onCancel(() => {
@@ -141,7 +142,6 @@ watch(
     // 确保在点击没有子路由的菜单时才添加历史记录
     const historyStore = useHistoryStore();
     const route = authStore.accessRoutes.find(route => route.name === to.name);
-    debugger;
     // 如果路由存在，并且没有 children，则添加到 history
     if (route && (!route.children || route.children.length === 0)) {
       historyStore.addHistory({ name: route.name, meta: route.meta, path: to.path });

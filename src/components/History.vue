@@ -53,16 +53,13 @@ const historyRoutes = computed(() => {
   const authStore = useAuthStore();
   const filteredRoutes = store.historyStack.filter(route => {
     // 只保留不包含子路由的菜单
-    console.log(authStore.accessRoutes);
-    debugger;
     const mockRoute = authStore.accessRoutes.find(rou => rou.name === route.name);
-    console.log(mockRoute);
     return !mockRoute?.children || mockRoute.children.length === 0; // 确保没有子路由
   });
-  debugger;
   // 确保第一个 tab 始终是首页
   // return [{ path: '/', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> '/' != v.path))];
-     return [{ path: '/index', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> (('/index' != v.path) || ('/' != v.path)) ))];
+
+    return [...(filteredRoutes.filter(v=> v.name &&('/index' != v.path || ('/' != v.path)) ))];;
 });
 
 function navTo (path) {

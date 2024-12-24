@@ -8,10 +8,7 @@ import {
 import { constantRoutes } from "./routes";
 import { useHistoryStore } from "src/stores/tagViewStore";
 import { useAuthStore } from "src/stores/authStore";
-//import { fakeBackend } from "src/fakeBackend";
-//import {getMenuList} from "src/api/login/menus";
-//import {devRoutes} from "src/router/devRouter";
-//import {filterAllRoutes} from "src/utils/handleRoutes";
+
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -57,10 +54,12 @@ export default route(function (/* { store, ssrContext } */) {
       if(authStore.roles.length == 0){
           await authStore.handelUserInfo();
           await authStore.handelUserMenu();
+
         authStore.accessRoutes.forEach(v=>{
           // Router.addRoute("Home", v);
-          Router.addRoute(v);
+            Router.addRoute(v);
         })
+
           authStore.setMenu(true);
           next({ ...to, replace: true })
       }else {

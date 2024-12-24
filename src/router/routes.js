@@ -7,7 +7,7 @@ export const constantRoutes = [
       title: "首页",
       icon: "home",
     },
-    // redirect: "index",
+    redirect: { path: '/index' },
     id: "0-0",
     order: 0,
     type: "1",
