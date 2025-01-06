@@ -19,7 +19,7 @@ export const useAuthStore = defineStore("authStore", {
     avatar: "",
     roles: [],
     perms: [],
-    accessRoutes: JSON.parse(localStorage.getItem("accessRoutes")) || []
+    accessRoutes: []
   }),
   actions: {
     setMenu(f) {
@@ -35,9 +35,10 @@ export const useAuthStore = defineStore("authStore", {
     },
     setRoles(roles) {
       this.roles = roles;
+      localStorage.setItem("roles", JSON.stringify(roles));
     },
     setPerms(perms) {
-      this.setPerms = perms;
+      this.perms = perms;
     },
     setAccessRoutes(accessRoutes) {
       this.accessRoutes = accessRoutes;

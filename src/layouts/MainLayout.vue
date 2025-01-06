@@ -59,12 +59,13 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      class="bg-blue-grey-10 text-white"
     >
       <q-list>
         <q-item-label
           header
         >
-          Essential Links
+          <div class="text-h7 text-white text-weight-bold">实验室系统中继服务</div>
         </q-item-label>
         <EssentialLink
           v-for="link in linksList"
@@ -96,6 +97,7 @@ defineOptions({
 })
 const $q = useQuasar();
 const router = useRouter();
+
 const authStore = useAuthStore();
 // 生成动态菜单项
 // const linksList = authStore.accessRoutes;

@@ -1,1 +1,8 @@
 // app global css in SCSS form
+
+// 让q-input 的高度和 q-btn size=sm的高度保持一致
+.q-input-sm .q-field__control,
+.q-input-sm .q-field__marginal {
+  height: 28px;
+  font-size: 14px;
+}

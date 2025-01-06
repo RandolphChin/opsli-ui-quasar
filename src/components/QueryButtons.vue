@@ -1,8 +1,8 @@
 <!-- QueryButtons.vue -->
 <template>
-  <div class="q-mb-md flex items-center">
-    <q-btn label="查询" unelevated @click="onSearch" color="primary" class="q-mr-xs" />
-    <q-btn label="重置" unelevated @click="onReset" color="secondary" />
+  <div> <!-- <div class="q-mb-md flex items-center"> -->
+    <q-btn label="查询" unelevated @click="onSearch" color="positive" size="sm" class="q-mr-sm text-weight-bold" />
+    <q-btn label="重置" unelevated @click="onReset" color="warning" size="sm" class="text-weight-bold"/>
   </div>
 </template>
 

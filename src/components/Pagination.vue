@@ -22,16 +22,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import {computed, ref, watch} from 'vue';
 defineOptions({
   name: 'qPagination'
 });
 const props = defineProps({
   currentPage: {
-    type: Number,
-    required: true,
-  },
-  maxPages: {
     type: Number,
     required: true,
   },
@@ -41,12 +37,13 @@ const props = defineProps({
   },
   rowsPerPageOptions: {
     type: Array,
-    required: true,
+    required: false,
     default: () => [10,20,30,50]
   },
   rowsPerPage: {
     type: Number,
     required: true,
+    default: 20
   },
 });
 
@@ -64,7 +61,7 @@ watch(() => props.currentPage, (newPage) => {
 watch(() => props.rowsPerPage, (newPerPage) => {
   localRowsPerPage.value = newPerPage;
 });
-
+const maxPages = computed(() => Math.ceil(props.rowsNumber / localRowsPerPage.value));
 // 更新当前页方法
 const updateCurrentPage = (page) => {
   localCurrentPage.value = page;

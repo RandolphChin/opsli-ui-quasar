@@ -37,7 +37,6 @@ export default route(function (/* { store, ssrContext } */) {
   // 在导航守卫中更新历史记录
   Router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
-    console.log("setMenuFlag ", authStore.setMenuFlag);
     // 如果是登录页面，直接放行
     if (to.path == "/login") {
       return next(); // 已经在登录页，直接放行
@@ -51,7 +50,7 @@ export default route(function (/* { store, ssrContext } */) {
     if(!accessToken){
       next("/login");
     }else {
-      if(authStore.roles.length == 0){
+      if(authStore.roles.length == 0 && !authStore.setMenuFlag){
           await authStore.handelUserInfo();
           await authStore.handelUserMenu();
 
