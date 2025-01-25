@@ -16,7 +16,7 @@
             >
           <div class="row items-center no-wrap">
             <span class="q-mr-xs">{{ key.meta.title}}</span>
-            <q-btn icon="close" dense @click.stop="closeTab(key)" flat size="6px" round/>
+            <q-btn icon="close" v-if="key.path != '/index'" dense @click.stop="closeTab(key)" flat size="6px" round/>
           </div>
         </q-tab>
       </q-tabs>
@@ -51,15 +51,26 @@ const menuPosition = ref({ x: 0, y: 0 }); // 存储菜单位置
 const historyRoutes = computed(() => {
   const store = useHistoryStore();
   const authStore = useAuthStore();
-  const filteredRoutes = store.historyStack.filter(route => {
+  const homeRoute = {
+    path: "/index",
+    name: "Index",
+    component: () => import("pages/index/Index.vue"),
+    meta: {
+      title: "首页",
+      affix: true,
+    },
+    children: []
+  }
+  const filteredRoutes = store.historyStack.filter((route) => {
     // 只保留不包含子路由的菜单
-    const mockRoute = authStore.accessRoutes.find(rou => rou.name === route.name);
+    const mockRoute = authStore.accessRoutes.find((rou) => rou.name === route.name);
     return !mockRoute?.children || mockRoute.children.length === 0; // 确保没有子路由
   });
-  // 确保第一个 tab 始终是首页
-  // return [{ path: '/', meta: { title: '首页' } }, ...(filteredRoutes.filter(v=> '/' != v.path))];
 
-    return [...(filteredRoutes.filter(v=> v.name &&('/index' != v.path || ('/' != v.path)) ))];;
+  // 合并 "首页" 和其他路由
+  debugger;
+  const routesWithHome = [homeRoute, ...filteredRoutes.filter((v) => (v.path !== '/' &&　v.path !== '/index'))];
+  return routesWithHome;
 });
 
 function navTo (path) {
@@ -136,6 +147,7 @@ function closeRightTabs(tab) {
   menuVisible.value = false; // 关闭菜单
 }
 watchEffect(() =>{
+  debugger;
   activeTab.value = route.name
 })
 </script>

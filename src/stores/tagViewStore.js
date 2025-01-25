@@ -8,7 +8,9 @@ export const useHistoryStore = defineStore('useHistoryStore', {
     addHistory(route) {
       // 确保不重复添加相同的路由
       if (!this.historyStack.find(r => r.name == route.name)) {
-        this.historyStack.push(route);
+        if(route.name){
+          this.historyStack.push(route);
+        }
       }
     },
     removeRoute(route) {
