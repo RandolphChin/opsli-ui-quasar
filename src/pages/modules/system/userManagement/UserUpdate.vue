@@ -142,6 +142,10 @@ import { useQuasar } from 'quasar';
 import { doUpdate } from '@/api/system/user/userManagement';
 import { getDictList } from 'src/utils/dict';
 
+defineOptions({
+  name: 'UserUpdate'
+})
+
 const formRef = ref(null);
 const isOpen = ref(false); // 控制弹窗是否显示
 const formData = ref({

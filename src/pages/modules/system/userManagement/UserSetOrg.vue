@@ -73,10 +73,14 @@
   </q-dialog>
 </template>
 <script setup>
-import { ref } from 'vue'
+import {ref, watch} from 'vue'
 import {QTree, useQuasar} from 'quasar'
 import { getTreeByDef } from '@/api/system/org/orgManagement';
 import { doSetOrg, getOrgByUserId } from '@/api/system/user/userManagement';
+
+defineOptions({
+  name: 'UserSetOrg'
+})
 
 const orgFilter = ref('');
 const orgFilterRef = ref(null);
@@ -137,7 +141,7 @@ const resetTreeCheck = () => {
       m.checked = false;
     }
   })
-  // ticked.value = []
+  ticked.value = []
 }
 // 处理节点选中事件
 const handleNodeSelected = (selectedNodeId) => {
@@ -245,6 +249,8 @@ const confirm = () => {
   console.log(params);
   // isOpen.value = false;
 }
+
+
 // 暴露 `openDialog` 方法供父组件调用
 defineExpose({
   openDialog,

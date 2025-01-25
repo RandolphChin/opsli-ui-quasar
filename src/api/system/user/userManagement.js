@@ -53,3 +53,11 @@ export function getOrgByUserId(data) {
     params: data,
   });
 }
+
+export function doGetRoles(data) {
+  return api({
+    url: "/api/v1/system/user/roles/getRoles",
+    method: "get",
+    params: data,
+  });
+}

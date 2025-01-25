@@ -48,9 +48,7 @@
           </template>
 
           <template v-slot:top>
-            <q-toolbar>
               <q-btn @click="addItem" label="新增" size="sm" unelevated class="q-mr-sm glossy" color="primary" icon="add" />
-            </q-toolbar>
           </template>
           <template v-slot:body-cell-enable="props">
             <q-td :props="props">
@@ -63,14 +61,15 @@
             </q-td>
           </template>
           <template v-slot:body-cell-actions="props">
-            <q-td>
+            <q-td style="position: sticky; right: 0; background: white; z-index: 1;">
               <q-btn
                 @click="editItem(props.row)"
                 label="编辑"
                 color="primary"
                 flat
+                padding="sm"
               />
-              <q-btn-dropdown flat color="primary" label="更多">
+              <q-btn-dropdown flat padding="xs" color="primary" label="更多">
                 <q-list dense>
                   <q-item clickable v-close-popup @click="setOrg(props.row)">
                     <q-item-section>
@@ -78,7 +77,7 @@
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup @click="onItemClick">
+                  <q-item clickable v-close-popup @click="setRole(props.row)">
                     <q-item-section>
                       <q-item-label>授权角色</q-item-label>
                     </q-item-section>
@@ -107,6 +106,7 @@
     </div>
     <UserUpdate ref="userUpdateRef" @fetchData="fetchData"/>
     <UserSetOrg ref="useSetOrgRef" @fetchData="fetchData" />
+    <UserRoles ref="userRolesRef" />
   </div>
 </template>
 
@@ -117,15 +117,17 @@ import Pagination from '@/components/Pagination.vue'; // Import your new compone
 import { getTreeByDefWithUserToLike } from '@/api/system/org/orgManagement';
 import { getList, doEnableAccount } from '@/api/system/user/userManagement';
 import {useQuasar} from "quasar";
-import UserUpdate from './UserUpdate.vue'
-import UserSetOrg from './UserSetOrg.vue'
+import UserUpdate from './UserUpdate.vue';
+import UserSetOrg from './UserSetOrg.vue';
+import UserRoles from './UserRoles.vue';
 
 defineOptions({
   name: 'UserManagement'
 })
 
-const orgFilter = ref('')
-const orgFilterRef = ref(null)
+const orgFilter = ref('');
+const orgFilterRef = ref(null);
+const userRolesRef = ref(null);
 const orgTreeData = ref([]);
 const orgSelectedKeys = ref(null);
 const orgTree = ref();
@@ -266,16 +268,15 @@ const setOrg = (row) => {
   console.log('设置组织', row);
   useSetOrgRef.value.openDialog(row);
 };
+
+const setRole = (row) => {
+  console.log('设置组织', row);
+  userRolesRef.value.openDialog(row);
+};
 </script>
 
 <style scoped>
-/*
- 使用 q-input-sm-height 替换
-:deep(.input-box .q-field__control),
-:deep(.input-box .q-field__marginal) {
-  height: 28px;
-  font-size: 14px;
+.table :deep(.q-checkbox__inner)  {
+  transform: scale(0.8); /* 缩小复选框 */
 }
-*/
-
 </style>
