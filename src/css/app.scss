@@ -5,7 +5,7 @@
 .q-input-sm .q-field__control,
 .q-input-sm .q-field__marginal {
   height: 28px;
-  font-size: 14px;
+  font-size: 13px;
 }
 /**
  *   form表单中，让label和input保持水平对齐,示例
@@ -30,6 +30,83 @@
   font-weight: bold;
   line-height: 1.5; /* 保证 label 垂直居中 */
   text-align: right;
-  min-width: 70px;
+  min-width: 80px;
+}
+// *** END ****
+// *** BEGIN ****
+// 自定义按钮大小 mds，让按钮中文字大小和table中文字大小一致  md-14px sm-12px
+.q-btn--mds {
+  font-size: 13px; // 字体大小
+  line-height: 1.0; // 按钮高度
+  padding: 0 12px; // 内边距，根据需要调整
+  min-width: 64px; // 最小宽度，根据需要调整
+}
+// *** END ****
+// *** BEGIN ****
+// 自定义label大小 mds，让label中文字大小和table中文字大小一致
+.q-label--mds {
+  font-size: 13px; // 字体大小
+  line-height: 1.2; // 按钮高度
+}
+// *** END ****
+// *** BEGIN ****
+// 修改q-table表格内字体大小，默认是13px，这里修改为14px,让字段大小和 btn size-md 大小一样
+/*
+.q-table {
+  td {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+}
+*/
+// *** END ****
+// *** BEGIN ****
+/* 修正图标垂直居中问题 */
+.q-btn__content {
+  display: flex;
+  align-items: center; /* 确保 Flex 子项垂直居中 */
+}
+
+/* 针对图标微调位置 */
+.q-btn .q-icon {
+  position: relative;
+  top: 1px; /* 根据实际偏移量微调（通常 1px-2px） */
+}
+// *** END ****
+// *** BEGIN ****
+// 解决q-select 设置 dense 后，高度仍旧我 q-input-sm定义的高度不一致
+.q-select-sm {
+  .q-field__control {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding-right: 4px !important;
+    font-size: 13px;
+
+    .q-field__native {
+      min-height: 28px !important;
+      height: 28px !important;
+    }
+
+    .q-field__append {
+      min-height: 28px !important;
+      height: 28px !important;
+    }
+  }
+}
+// *** END ****
+// *** BEGIN ****
+// 解决表格中第一列筛选框过大显示问题
+/*  单页面中的写法
+*  在Vue的scoped样式中，使用:deep()可以穿透子组件的样式，但在全局样式中，不需要:deep()，
+*  直接写选择器即可。在app.scss中保留了:deep()，导致选择器无法正确解析，从而样式不生效。
+.table :deep(.q-checkbox__inner)  {
+  transform: scale(0.8); !* 缩小复选框 *!
+}
+*/
+
+.table {
+  .q-checkbox__inner {
+    transform: scale(0.8); /* 缩小复选框 */
+  }
 }
 // *** END ****

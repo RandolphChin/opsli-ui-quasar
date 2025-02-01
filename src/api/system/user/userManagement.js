@@ -61,3 +61,56 @@ export function doGetRoles(data) {
     params: data,
   });
 }
+
+export function doSetRoles(data) {
+  return api({
+    url: "/api/v1/system/user/roles/setRoles",
+    method: "post",
+    data,
+  });
+}
+
+export async function doDelete(data) {
+  const encryptRSA = setting.encryptRSA;
+  if (encryptRSA) {
+    let publicKeyStore = usePublicKeyStore();
+    await publicKeyStore.fetchPublicKey()
+    let publicKey = publicKeyStore.publicKey;
+    let encrypted = encryptedRsa(data, publicKey);
+    data = {
+      encryptData: encrypted,
+    };
+  }
+  return api({
+    url: "/api/v1/system/user/del",
+    method: "post",
+    data,
+  });
+}
+
+
+export async function doDeleteAll(data) {
+  const encryptRSA = setting.encryptRSA;
+  if (encryptRSA) {
+    let publicKeyStore = usePublicKeyStore();
+    await publicKeyStore.fetchPublicKey()
+    let publicKey = publicKeyStore.publicKey;
+    let encrypted = encryptedRsa(data, publicKey);
+    data = {
+      encryptData: encrypted,
+    };
+  }
+  return api({
+    url: "/api/v1/system/user/delAll",
+    method: "post",
+    data,
+  });
+}
+
+export function doInsert(data) {
+  return api({
+    url: "/api/v1/system/user/insert",
+    method: "post",
+    data,
+  });
+}

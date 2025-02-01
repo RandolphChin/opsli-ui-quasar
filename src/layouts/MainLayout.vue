@@ -60,7 +60,7 @@
       show-if-above
       bordered
       class="bg-blue-grey-10 text-white"
-      width="220"
+      :width="220"
     >
       <q-list>
         <q-item-label

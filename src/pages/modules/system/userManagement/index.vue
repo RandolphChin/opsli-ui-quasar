@@ -26,6 +26,7 @@
             <q-input v-model="filter.username_LIKE" placeholder="请输入用户名" clearable class="q-mr-sm q-input-sm" dense outlined />
             <q-input v-model="filter.realName_LIKE" placeholder="请输入昵称" clearable class="q-mr-sm q-input-sm" dense outlined />
             <q-input v-model="filter.no_EQ" placeholder="请输入工号" clearable class="q-mr-sm q-input-sm" dense outlined />
+
             <QueryButtons :onSearch="fetchData" :onReset="resetFilter" />
           </div>
         </q-toolbar>
@@ -48,7 +49,10 @@
           </template>
 
           <template v-slot:top>
-              <q-btn @click="addItem" label="新增" size="sm" unelevated class="q-mr-sm glossy" color="primary" icon="add" />
+            <q-btn-group outline>
+              <q-btn @click="addItem" label="新增" outline size="md" color="primary" icon="add" />
+              <q-btn @click="deleteItem" label="删除" outline size="md" color="primary" icon="delete_outline" :disable="selected.length == 0"/>
+            </q-btn-group>
           </template>
           <template v-slot:body-cell-enable="props">
             <q-td :props="props">
@@ -64,11 +68,53 @@
             <q-td style="position: sticky; right: 0; background: white; z-index: 1;">
               <q-btn
                 @click="editItem(props.row)"
-                label="编辑"
+                flat dense rounded
                 color="primary"
-                flat
-                padding="sm"
-              />
+                icon="edit"
+              >
+                <q-tooltip>
+                  <template v-slot:default>
+                  编辑
+                  </template>
+                </q-tooltip>
+              </q-btn>
+              <q-btn
+                @click="setOrg(props.row)"
+                flat dense rounded
+                color="positive"
+                icon="group"
+              >
+                <q-tooltip>
+                  <template v-slot:default>
+                  授权组织
+                  </template>
+                </q-tooltip>
+              </q-btn>
+              <q-btn
+                @click="setRole(props.row)"
+                flat dense rounded
+                color="warning"
+                icon="manage_accounts"
+              >
+                <q-tooltip>
+                  <template v-slot:default>
+                  授权角色
+                  </template>
+                </q-tooltip>
+              </q-btn>
+              <q-btn
+                @click="deleteItem(props.row)"
+                flat dense rounded
+                color="negative"
+                icon="delete"
+              >
+                <q-tooltip>
+                  <template v-slot:default>
+                  删除
+                  </template>
+                </q-tooltip>
+              </q-btn>
+<!--
               <q-btn-dropdown flat padding="xs" color="primary" label="更多">
                 <q-list dense>
                   <q-item clickable v-close-popup @click="setOrg(props.row)">
@@ -90,6 +136,7 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
+              -->
             </q-td>
           </template>
           <template v-slot:bottom>
@@ -104,9 +151,9 @@
         </q-table>
       </div>
     </div>
-    <UserUpdate ref="userUpdateRef" @fetchData="fetchData"/>
+    <UserUpdate ref="userUpdateRef" @fetchData="fetchData" />
     <UserSetOrg ref="useSetOrgRef" @fetchData="fetchData" />
-    <UserRoles ref="userRolesRef" />
+    <UserRoles ref="userRolesRef" @fetchData="fetchData" />
   </div>
 </template>
 
@@ -115,7 +162,7 @@ import {onMounted, ref} from 'vue';
 import QueryButtons from '@/components/QueryButtons.vue'; // Import your new component
 import Pagination from '@/components/Pagination.vue'; // Import your new component
 import { getTreeByDefWithUserToLike } from '@/api/system/org/orgManagement';
-import { getList, doEnableAccount } from '@/api/system/user/userManagement';
+import { getList, doEnableAccount, doDelete, doDeleteAll } from '@/api/system/user/userManagement';
 import {useQuasar} from "quasar";
 import UserUpdate from './UserUpdate.vue';
 import UserSetOrg from './UserSetOrg.vue';
@@ -134,6 +181,7 @@ const orgTree = ref();
 const $q = useQuasar();
 const userUpdateRef = ref();
 const useSetOrgRef = ref();
+const orgNode = ref(null);
 
 const resetOrgFilter =() =>{
   orgFilter.value = ''
@@ -150,8 +198,18 @@ const loadOrgTree = () => {
 }
 const clickTreeNode = () => {
   // const tree = this.$refs.tree;
+  /*
   const node = orgTree.value.getNodeByKey(orgSelectedKeys.value);
   filter.value.orgIdGroup = node.orgIds ? node.orgIds : node.id;
+  */
+  const node = orgTree.value.getNodeByKey(orgSelectedKeys.value);
+  if("org_all" !== orgSelectedKeys.value && "org_null" !== orgSelectedKeys.value){
+    filter.value.orgIdGroup = node.parentIds + "," + orgSelectedKeys.value;
+    orgNode.value = node;
+  }else {
+    filter.value.orgIdGroup = orgSelectedKeys.value;
+    orgNode.value = null;
+  }
   fetchData();
 }
 
@@ -252,6 +310,8 @@ const getSelected = (newSelected) => {
 
 const addItem = () => {
   console.log('添加新项目');
+  userUpdateRef.value.openDialog();
+  userUpdateRef.value.showInsertAndBindOrg(orgNode.value);
 };
 
 const editItem = (row) => {
@@ -261,6 +321,35 @@ const editItem = (row) => {
 
 const deleteItem = (row) => {
   console.log('删除项目', row);
+  $q.dialog({
+    title: '提示',
+    message: '确定要删除勾选项吗?',
+    persistent: true,
+    ok: {
+      label: '确定', // 确认按钮的文本
+      color: 'primary', // 确认按钮的颜色
+      flat: false, // 是否使用扁平化样式
+      size: 'sm'
+    },
+    cancel: {
+      label: '取消', // 取消按钮的文本
+      size: 'sm',
+      flat: true
+    }
+  }).onOk(() => {
+    console.log('>>>> OK')
+    if(row.id){
+      confirmDelete(row)
+    }else {
+      confirmBatchDelete();
+    }
+  }).onOk(() => {
+    console.log('>>>> second OK catcher')
+  }).onCancel(() => {
+    console.log('>>>> Cancel')
+  }).onDismiss(() => {
+     console.log('I am triggered on both OK and Cancel')
+  })
 };
 
 
@@ -273,10 +362,23 @@ const setRole = (row) => {
   console.log('设置组织', row);
   userRolesRef.value.openDialog(row);
 };
+
+const confirmDelete = (row) => {
+  doDelete({ id: row.id }).then(res => {
+    $q.notify({ type: 'positive', message: res.data.msg });
+    fetchData();
+  })
+}
+const confirmBatchDelete = () => {
+  const ids = selected.value.map((item) => item.id).join();
+  doDeleteAll({ ids }).then(res => {
+    $q.notify({ type: 'positive', message: res.data.msg });
+    selected.value = [];
+    fetchData();
+  })
+}
 </script>
 
-<style scoped>
-.table :deep(.q-checkbox__inner)  {
-  transform: scale(0.8); /* 缩小复选框 */
-}
+<style scoped lang="scss">
+
 </style>

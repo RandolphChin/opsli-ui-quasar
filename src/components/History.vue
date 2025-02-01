@@ -68,7 +68,6 @@ const historyRoutes = computed(() => {
   });
 
   // 合并 "首页" 和其他路由
-  debugger;
   const routesWithHome = [homeRoute, ...filteredRoutes.filter((v) => (v.path !== '/' &&　v.path !== '/index'))];
   return routesWithHome;
 });
@@ -147,7 +146,6 @@ function closeRightTabs(tab) {
   menuVisible.value = false; // 关闭菜单
 }
 watchEffect(() =>{
-  debugger;
   activeTab.value = route.name
 })
 </script>

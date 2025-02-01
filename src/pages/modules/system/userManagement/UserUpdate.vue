@@ -2,7 +2,7 @@
   <q-dialog v-model="isOpen">
     <q-card style="min-width: 650px;">
       <q-card-section>
-        <div class="text-h6">编辑</div>
+        <div class="text-h6">{{ formData.title }}</div>
       </q-card-section>
 
       <q-separator />
@@ -21,7 +21,8 @@
                     dense
                     :rules="[rules.required('用户名'), rules.username]"
                     style="width: 180px"
-                    disable
+                    :disable="null != formData.id"
+                    class="q-input-sm"
                   />
                 </div>
               </div>
@@ -36,7 +37,39 @@
                   dense
                   :rules="[rules.required('昵称'), rules.realName]"
                   style="width: 180px"
+                  class="q-input-sm"
                 />
+              </div>
+            </div>
+          </div>
+          <div class="row" v-if="null == formData.id">
+            <div class="col-12 col-md-6">
+              <div class="q-form-row">
+                <label class="q-form-label"><span class="text-red">*</span> 密码：</label>
+                <q-input v-model="formData.password" dense outlined :type="isPwd ? 'password' : 'text'" :rules="[rules.required('密码'), rules.password]" style="width: 180px" class="q-input-sm">
+                  <template v-slot:append>
+                    <q-icon
+                      :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd"
+                    />
+                  </template>
+                </q-input>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <!-- 手机 -->
+              <div class="q-form-row">
+                <label class="q-form-label"><span class="text-red">*</span> 确认密码：</label>
+                <q-input v-model="formData.verifyPassword" dense outlined :type="isVerifyPwd ? 'password' : 'text'" :rules="[rules.required('确认密码'), rules.verifyPassword]" style="width: 180px" class="q-input-sm">
+                  <template v-slot:append>
+                    <q-icon
+                      :name="isVerifyPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isVerifyPwd = !isVerifyPwd"
+                    />
+                  </template>
+                </q-input>
               </div>
             </div>
           </div>
@@ -51,6 +84,7 @@
                   dense
                   :rules="[rules.required('工号'), rules.no]"
                   style="width: 180px"
+                  class="q-input-sm"
                 />
               </div>
             </div>
@@ -64,6 +98,7 @@
                   dense
                   :rules="[rules.required('手机'), rules.mobile]"
                   style="width: 180px"
+                  class="q-input-sm"
                 />
               </div>
             </div>
@@ -79,6 +114,7 @@
                   dense
                   :rules="[rules.required('邮箱'), rules.email]"
                   style="width: 180px"
+                  class="q-input-sm"
                 />
               </div>
             </div>
@@ -90,6 +126,7 @@
                   outlined
                   dense
                   style="width: 180px"
+                  class="q-input-sm"
                 />
               </div>
             </div>
@@ -108,6 +145,7 @@
                           options-dense
                           dense
                           style="width: 180px"
+                          class="q-select-sm"
                           placeholder="切换租户" />
               </div>
             </div>
@@ -119,6 +157,7 @@
                   outlined
                   dense
                   style="width: 180px"
+                  class="q-input-sm"
                 />
               </div>
             </div>
@@ -139,7 +178,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
-import { doUpdate } from '@/api/system/user/userManagement';
+import { doUpdate, doInsert, doSetOrg } from '@/api/system/user/userManagement';
 import { getDictList } from 'src/utils/dict';
 
 defineOptions({
@@ -149,16 +188,23 @@ defineOptions({
 const formRef = ref(null);
 const isOpen = ref(false); // 控制弹窗是否显示
 const formData = ref({
-  username: null,
-  realName: null,
-  no: null,
-  mobile: null,
-  email: null,
+  id: null,
+  username: 'adminU',
+  realName: 'adminU',
+  no: 'U1001',
+  mobile: '13000000001',
+  email: 'u@qq.com',
   remark: null,
   sign: null,
   enableSwitchTenant: null,
-  loading: false
+  loading: false,
+  password: 'Aa123456.',
+  verifyPassword: 'Aa123456.',
+  title: '编辑'
 });
+const isPwd = ref(true);
+const isVerifyPwd = ref(true);
+const orgNode = ref(null);
 
 const $q = useQuasar();
 const emit = defineEmits(['fetchData']);
@@ -173,12 +219,29 @@ const rules = {
   length: (fieldName, min, max) => (val) =>
     (val && val.length >= min && val.length <= max) ||
     `${fieldName}长度必须在 ${min}-${max} 个字符之间`,
+  password: (val) => {
+    const hasUpperCase = /[A-Z]/.test(val); // 包含大写字母
+    const hasLowerCase = /[a-z]/.test(val); // 包含小写字母
+    const hasNumber = /\d/.test(val); // 包含数字
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val); // 包含特殊字符
+    const isLengthValid = val && val.length >= 6; // 长度至少 6 位
+
+    return (
+      (hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isLengthValid) ||
+      '密码必须包含大小写字母、数字、特殊字符，且不少于6位'
+    );
+  },
+  verifyPassword: (val) => val === formData.value.password || '两次输入的密码不一致',
 };
 const enableSwitchTenantOptions = ref([]);
 // 打开对话框，并接收当前行数据
 const openDialog = (rowData) => {
   isOpen.value = true;
-  formData.value = { ...rowData }; // 初始化弹窗中的表单数据
+  if(rowData){
+    formData.value = { ...rowData, title: '编辑' };
+  }else {
+    // formData.value = {title: '新增' };
+  }
   initEnableSwitchTenantOptions();
 };
 
@@ -198,12 +261,33 @@ const confirm = () => {
     if (success) {
       // model 数据验证通过
       formData.value.loading = true;
-      doUpdate(formData.value).then(res => {
-        $q.notify({ type: 'positive', message: res.data.msg });
-        formData.value.loading = false;
-        emit('fetchData');
-        closeDialog();
-      })
+      if(formData.value.id){
+        doUpdate(formData.value).then(res => {
+          $q.notify({ type: 'positive', message: res.data.msg });
+          formData.value.loading = false;
+          emit('fetchData');
+          closeDialog();
+        })
+      }else {
+        doInsert(formData.value).then(async res => {
+          if (res.data.code == 0) {
+            const param = {
+              userId: res.data.data.id,
+              orgModel: orgNode.value,
+              izDef: '1',
+            }
+            if (orgNode.value) {
+              await doSetOrg(param);
+            }
+            $q.notify({type: 'positive', message: res.data.msg});
+            formData.value.loading = false;
+            emit('fetchData');
+            closeDialog();
+          } else {
+            $q.notify({type: 'positive', message: res.data.msg});
+          }
+        })
+      }
     } else {
       // 数据验证失败
       // 用户至少输入了一个无效值
@@ -217,10 +301,13 @@ const initEnableSwitchTenantOptions = () =>{
   enableSwitchTenantOptions.value =dicList;
 }
 
+const showInsertAndBindOrg = (orgNodeFromParent) => {
+  orgNode.value = orgNodeFromParent
+}
 
 // 暴露 `openDialog` 方法供父组件调用
 defineExpose({
-  openDialog,
+  openDialog, showInsertAndBindOrg
 });
 </script>
 
