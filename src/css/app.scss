@@ -74,7 +74,7 @@
 }
 // *** END ****
 // *** BEGIN ****
-// 解决q-select 设置 dense 后，高度仍旧我 q-input-sm定义的高度不一致
+// 解决q-select 设置 dense 后，高度仍旧与 q-input-sm定义的高度不一致
 .q-select-sm {
   .q-field__control {
     min-height: 28px !important;
