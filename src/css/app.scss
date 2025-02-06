@@ -74,6 +74,18 @@
 }
 // *** END ****
 // *** BEGIN ****
+/* 修正表格中top slot中的按钮中文字和图标偏离中线靠上问题 */
+.table .q-btn__content {
+  display: flex;
+  align-items: center; /* 确保 Flex 子项垂直居中 */
+  position: relative;
+  top: 1px;
+}
+.table .q-icon {
+
+}
+// *** END ****
+// *** BEGIN ****
 // 解决q-select 设置 dense 后，高度仍旧与 q-input-sm定义的高度不一致
 .q-select-sm {
   .q-field__control {

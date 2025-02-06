@@ -50,8 +50,8 @@
 
           <template v-slot:top>
             <q-btn-group outline>
-              <q-btn @click="addItem" label="新增" outline size="md" color="primary" icon="add" />
-              <q-btn @click="deleteItem" label="删除" outline size="md" color="primary" icon="delete_outline" :disable="selected.length == 0"/>
+              <q-btn @click="addItem" label="新增" outline size="sm" color="primary" icon="add" />
+              <q-btn @click="deleteItem" label="删除" outline size="sm" color="primary" icon="delete_outline" :disable="selected.length == 0"/>
             </q-btn-group>
           </template>
           <template v-slot:body-cell-enable="props">
