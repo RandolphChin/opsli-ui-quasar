@@ -168,8 +168,8 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn size="sm" flat label="取消" color="primary" @click="cancel" />
-        <q-btn size="sm" label="确定" :loading="formData.loading" color="primary" @click="confirm" />
+        <q-btn size="md" dense flat label="取消" color="primary" @click="cancel" />
+        <q-btn size="md" dense label="确定" :loading="formData.loading" color="primary" @click="confirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>

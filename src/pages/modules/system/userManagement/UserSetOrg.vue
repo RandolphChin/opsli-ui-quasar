@@ -66,8 +66,8 @@
         </q-tree>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn size="sm" flat label="取消" color="primary" @click="isOpen = false" />
-        <q-btn size="sm" label="确定" :loading="loading" color="primary" @click="confirm" />
+        <q-btn dense flat label="取消" color="primary" @click="isOpen = false" />
+        <q-btn size="md" dense label="确定" :loading="loading" color="primary" @click="confirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>

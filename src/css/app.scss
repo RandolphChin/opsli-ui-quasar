@@ -1,12 +1,14 @@
 // app global css in SCSS form
 
-
+// *** BEGIN ****
 // 让q-input 的高度和 q-btn size=sm的高度保持一致
 .q-input-sm .q-field__control,
 .q-input-sm .q-field__marginal {
-  height: 28px;
+  height: 32px;
   font-size: 13px;
 }
+// *** END ****
+// *** BEGIN ****
 /**
  *   form表单中，让label和input保持水平对齐,示例
               <div class="q-form-row">
@@ -21,7 +23,6 @@
                 </div>
               </div>
  */
-// *** BEGIN ****
 .q-form-row {
   display: flex;
   align-items: baseline;
@@ -62,28 +63,37 @@
 // *** END ****
 // *** BEGIN ****
 /* 修正图标垂直居中问题 */
+/*
+
 .q-btn__content {
   display: flex;
-  align-items: center; /* 确保 Flex 子项垂直居中 */
+  align-items: center; !* 确保 Flex 子项垂直居中 *!
 }
+*/
 
 /* 针对图标微调位置 */
+
 .q-btn .q-icon {
   position: relative;
-  top: 1px; /* 根据实际偏移量微调（通常 1px-2px） */
+  top: 1px; // !* 根据实际偏移量微调（通常 1px-2px） *!
 }
+
 // *** END ****
 // *** BEGIN ****
 /* 修正表格中top slot中的按钮中文字和图标偏离中线靠上问题 */
+/*
+
 .table .q-btn__content {
   display: flex;
-  align-items: center; /* 确保 Flex 子项垂直居中 */
+  align-items: center; !* 确保 Flex 子项垂直居中 *!
   position: relative;
   top: 1px;
 }
 .table .q-icon {
 
 }
+*/
+
 // *** END ****
 // *** BEGIN ****
 // 解决q-select 设置 dense 后，高度仍旧与 q-input-sm定义的高度不一致
@@ -120,5 +130,19 @@
   .q-checkbox__inner {
     transform: scale(0.8); /* 缩小复选框 */
   }
+}
+// *** END ****
+// *** BEGIN ****
+// q-btn 参数size=md dense 时，再拉长按钮
+.q-toolbar .q-btn--dense {
+  padding-left: 0.8em !important;
+  padding-right: 1.0em !important;
+}
+// *** END ****
+// *** BEGIN ****
+// 解决弹窗中按钮字段不居中，偏上
+.q-btn {
+  font-size: 14px;
+  line-height: 1.71em; // 1.715em  ，只要小于1.715就可以居中，不知道为什么
 }
 // *** END ****
